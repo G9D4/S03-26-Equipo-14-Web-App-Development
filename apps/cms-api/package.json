@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "predev": "pnpm --dir ../../packages/api build",
     "dev": "nest start --watch",
+    "prebuild": "pnpm --dir ../../packages/api build",
     "build": "nest build",
     "start": "nest start",
     "start:debug": "nest start --debug --watch",
