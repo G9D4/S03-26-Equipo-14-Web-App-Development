@@ -62,8 +62,8 @@
     "./postcss.config": "./postcss.config.mjs",
     "./lib/*": "./src/lib/*.ts",
     "./components/*": {
-      "import": "./src/components/*.tsx",
-      "types": "./src/components/*.tsx"
+      "import": "./dist/components/*.js",
+      "types": "./dist/components/*.d.ts"
     },
     "./hooks/*": "./src/hooks/*.ts"
   }
