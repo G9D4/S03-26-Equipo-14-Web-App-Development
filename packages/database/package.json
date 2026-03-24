@@ -9,9 +9,9 @@
     "db:generate": "prisma generate",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:migrate:deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio",
+    "db:migrate": "npx dotenv-cli -e ../../.env -- npx prisma migrate dev --name",
+    "db:migrate:deploy": "npx dotenv-cli -e ../../.env -- npx prisma migrate deploy",
+    "db:studio": "npx prisma studio",
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
