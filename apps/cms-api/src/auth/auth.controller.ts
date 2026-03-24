@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { response, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorators/get-user.decorator';
+import { Public } from './decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -10,6 +11,7 @@ export class AuthController {
         private readonly authService: AuthService
     ){}
 
+    @Public()
     @Post("login")
     async login(@Body() loginDto : {email: string, password: string}, @Res({passthrough: true}) res: Response){
         const {access_token} = await this.authService.login(loginDto);
