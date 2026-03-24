@@ -1,19 +1,17 @@
-
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import cookieParser from "cookie-parser"
+import cookieParser from 'cookie-parser';
 import globalEnv from '@repo/env';
 import {UserRepository} from "@repo/api"
 import { ValidationPipe } from '@nestjs/common';
 
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
+  console.log('NODE_ENV', globalEnv.NODE_ENV);
   const app = await NestFactory.create(AppModule);
-  app.use(cookieParser())
-
-  console.log("Env", globalEnv.DIRECT_URL )
-
+  //Swagger documentation config
   const config = new DocumentBuilder()
     .setTitle('CMS API')
     .setDescription('API Documentation')
