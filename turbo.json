@@ -1,16 +1,31 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+
+  "globalEnv": [
+    "NODE_ENV",
+    "JWT_SECRET",
+    "PORT",
+    "NEXT_PUBLIC_API_URL",
+    "PRISMA_LOGS",
+    "DATABASE_URL"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "JWT_SECRET",
+        "PORT",
+        "NEXT_PUBLIC_API_URL",
+        "PRISMA_LOGS",
+        "DATABASE_URL"
+      ]
     },
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
-    "globalDotEnv": [".env"],
     "lint": {},
     "test": {},
     "test:e2e": {}

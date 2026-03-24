@@ -11,6 +11,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@repo/env": "workspace:*",
     "@repo/ui": "workspace:*",
     "next": "16.2.0",
     "next-auth": "^4.24.13",
