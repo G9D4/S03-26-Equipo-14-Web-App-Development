@@ -15,7 +15,7 @@ export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async find() {
-    return (await this.prisma.client.user.findMany()) as User;
+    return (await this.prisma.client.user.findMany()) as User[];
   }
 
   async createOwner(data: CreateOwnerInput): Promise<void> {
@@ -24,14 +24,23 @@ export class UserRepository {
         data: data.user,
       });
 
-      const org = await tx.Organization.create({
-        data: {
-          ...data.organization,
-          user_id: user.id,
-        },
-      });
+      const org = await tx.organization.create({
+      data: {
+        ...data.organization,
+        organizationMembers: {
+          create: [
+            {
+              user: {
+                connect: { id: user.id }
+              },
+              role: "Owner",
+            }
+          ]
+        }
+      },
+    });
 
-      const member = await tx.organizationMember.create({
+      const member = await tx.organization_Member.create({
         data: {
           user_id: user.id,
           organization_id: org.id,
@@ -48,9 +57,9 @@ export class UserRepository {
         },
       });
 
-      const projectMember = await tx.projectMember.create({
+      const projectMember = await tx.project_Member.create({
         data: {
-          org_member_id: member.id,
+          organization_member_id: member.id,
           project_id: project.id,
         },
       });
