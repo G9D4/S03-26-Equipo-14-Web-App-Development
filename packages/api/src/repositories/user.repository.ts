@@ -18,7 +18,7 @@ export class UserRepository {
     return (await this.prisma.client.user.findMany()) as User[];
   }
 
-  async createOwner(data: CreateOwnerInput): Promise<void> {
+  /* async createOwner(data: CreateOwnerInput): Promise<void> {
     return await this.prisma.client.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: data.user,
@@ -64,5 +64,5 @@ export class UserRepository {
         },
       });
     });
-  }
+  } */
 }
