@@ -1,4 +1,5 @@
 import { Button } from "@repo/ui/components";
+import { BookOpen } from '@repo/ui/lib';
 import Link from "next/link";
 
 export function LandingNavbar() {
@@ -7,21 +8,8 @@ export function LandingNavbar() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="size-7 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
-            <svg
-              viewBox="0 0 24 24"
-              className="size-4"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-            </svg>
+          <div className="p-2 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
+            <BookOpen className='text-white' />
           </div>
           <span className="font-semibold text-gray-900 text-sm">
             Geist EdTech

@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback } from "@repo/ui/components";
+import Image from 'next/image';
 
 interface TestimonialAuthor {
   name: string;
@@ -75,7 +76,7 @@ export function LandingTestimonials() {
           </div>
 
           {/* Row 1, Right: Marco Rivera - small card */}
-          <div className="col-span-5 md:col-span-2 bg-gray-50 border border-gray-100 rounded-2xl p-6 flex flex-col min-h-48">
+          <div className="col-span-5 md:col-span-2 bg-gray-50 border border-gray-100 rounded-2xl p-6 flex flex-col h-fit">
             <blockquote className="text-sm text-gray-500 leading-relaxed flex-1 italic">
               &ldquo;El widget es increíblemente rápido. Instalación en
               segundos y una estética que grita calidad premium.&rdquo;
@@ -109,7 +110,7 @@ export function LandingTestimonials() {
           {/* Row 2, Right: Image card */}
           <div className="col-span-5 md:col-span-3 rounded-2xl overflow-hidden relative min-h-48 bg-gradient-to-br from-amber-100 via-orange-200 to-amber-300 flex items-end">
             {/* Background decorative elements simulating people at work */}
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/70 via-gray-900/20 to-transparent" />
+            <Image src={'/testimonials-image.jpg'} alt="Testimonial Image" fill className='object-cover' />
             <div className="relative z-10 p-8">
               <p className="text-white font-bold text-xl leading-snug">
                 Potenciando el impacto visual de tu educación.

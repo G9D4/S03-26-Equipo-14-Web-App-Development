@@ -1,4 +1,5 @@
 import { Card } from "@repo/ui/components";
+import { File, FileText, Grid, Layout, Sparkles } from '@repo/ui/lib';
 
 function ShareNetworkIcon() {
   return (
@@ -61,19 +62,19 @@ function WidgetIcon() {
 
 const features = [
   {
-    icon: <ShareNetworkIcon />,
+    icon: <Sparkles />,
     title: "Gestión Inteligente",
     description:
       "Centraliza textos, videos y casos de estudio en una única bóveda digital.",
   },
   {
-    icon: <EditorialIcon />,
+    icon: <FileText />,
     title: "Curación Editorial",
     description:
       "Flujos de aprobación profesional para administradores y editores con control de versiones.",
   },
   {
-    icon: <WidgetIcon />,
+    icon: <Grid />,
     title: "Widget Desplegable",
     description:
       "Muestra los éxitos con un componente de alto rendimiento que se adapta a cualquier web.",
@@ -88,9 +89,9 @@ export function LandingFeatures() {
           {features.map((feature) => (
             <Card
               key={feature.title}
-              className="bg-white border border-gray-200 rounded-2xl p-8 shadow-none gap-0"
+              className="bg-white border-0 rounded-2xl p-8 shadow-none gap-0"
             >
-              <div className="mb-5">{feature.icon}</div>
+              <div className="mb-5 bg-indigo-600/10 text-indigo-600 w-fit p-2 rounded-lg">{feature.icon}</div>
               <h3 className="text-base font-semibold text-gray-900 mb-2">
                 {feature.title}
               </h3>
