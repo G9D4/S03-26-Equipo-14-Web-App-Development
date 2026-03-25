@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import cookieParser from "cookie-parser"
 import globalEnv from '@repo/env';
 import {UserRepository} from "@repo/api"
+import { ValidationPipe } from '@nestjs/common';
 
 
 async function bootstrap() {
