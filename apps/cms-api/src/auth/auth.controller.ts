@@ -41,11 +41,12 @@ export class AuthController {
   @Post('/owner')
   async owner(@Body() registerOwnerDto: CreateRegisterOwnerDto) {
     //use service registerOwner
-
+    return this.authService.registerOwner(registerOwnerDto);
   }
 
   @Post('/member')
   async member(@Body() registerMemberDto: CreateRegisterMemberDto) {
     //use service registerMember
+    return this.authService.registerMember(registerMemberDto);
   }
 }

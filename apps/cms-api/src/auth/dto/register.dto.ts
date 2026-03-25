@@ -24,16 +24,19 @@ export class CreateRegisterMemberDto {
   @IsEmail()
   email!: string;
   @IsString()
-  password!: string;
-  @IsString()
   name!: string;
   @IsString()
+  role!: string;
+  @IsString()
   organizationId!: string;
+  @IsString()
+  projectId!: string;
 }
 
 export interface CreateRegisterMemberInput {
   email: string;
-  password: string;
   name: string;
+  role: string;
   organizationId: string;
+  projectId: string;
 }

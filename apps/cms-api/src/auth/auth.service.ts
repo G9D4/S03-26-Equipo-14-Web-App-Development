@@ -1,14 +1,19 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { compare } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import {
   CreateRegisterMemberInput,
   CreateRegisterOwnerInput,
 } from './dto/register.dto';
+import crypto from 'crypto';
+import { UserRepository } from '@repo/api';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private readonly apiUser: UserRepository,
+  ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
     // TODO: validate user
@@ -31,19 +36,32 @@ export class AuthService {
   }
 
   async registerOwner(registerOwnerDto: CreateRegisterOwnerInput) {
-    //create user with role owner
-    //rel owner -> org
-    //create org
-    //rel org_member -> project
-    //create default proyect
+    const { password, ...newOwner } = registerOwnerDto;
 
-    //use transaction prisma for this
+    const hashPassword = await hash(password, 10);
+
+    const synthUser = {
+      ...newOwner,
+      hashPassword: hashPassword,
+    };
+
+    await this.apiUser.createOwner(synthUser);
   }
 
   async registerMember(registerMemberDto: CreateRegisterMemberInput) {
-    //create user with roles -(admin, editor)
-    //rel with organizationId
+    const randomPass = await this.generateRandomPassword();
 
-    //use transaction prisma for this
+    const hashPassword = await hash(randomPass, 10);
+
+    const synthUser = {
+      ...registerMemberDto,
+      generatePassword: hashPassword,
+    };
+
+    await this.apiUser.createMember(synthUser);
+  }
+
+  private async generateRandomPassword() {
+    return crypto.randomBytes(4).toString('base64').slice(0, 6);
   }
 }
