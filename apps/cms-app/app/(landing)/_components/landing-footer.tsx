@@ -1,3 +1,4 @@
+import { BookOpen } from '@repo/ui/lib';
 import Link from "next/link";
 
 const footerLinks = [
@@ -13,21 +14,8 @@ export function LandingFooter() {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <div className="size-6 rounded-md bg-indigo-600 flex items-center justify-center shrink-0">
-            <svg
-              viewBox="0 0 24 24"
-              className="size-3"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-            </svg>
+          <div className="p-2 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
+            <BookOpen className='text-white' />
           </div>
           <span className="text-sm font-semibold text-gray-900">
             Geist EdTech
