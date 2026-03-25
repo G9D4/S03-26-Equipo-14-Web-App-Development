@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import cookieParser from "cookie-parser"
 import globalEnv from '@repo/env';
+import {UserRepository} from "@repo/api"
 
 
 async function bootstrap() {
@@ -21,7 +22,21 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-  
+  //test repo/api
+  const userRepo = app.get(UserRepository);
+  const user = await userRepo.find();
+  console.log("test", user)  
+
+
+  //pipe for input data
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+  app.use(cookieParser());
   app.enableCors();
   await app.listen(3000);
 }
