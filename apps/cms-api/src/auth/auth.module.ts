@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import env from "@repo/env";
+import globalEnv from "@repo/env";
 
 @Module({
     imports: [
@@ -13,7 +13,7 @@ import env from "@repo/env";
         JwtModule.registerAsync({
             global: true,            
             useFactory: () => ({
-                secret: env.JWT_SECRET,
+                secret: globalEnv.JWT_SECRET,
                 signOptions: {expiresIn: "1d"}
             })
         }),        

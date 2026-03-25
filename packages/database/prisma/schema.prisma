@@ -11,109 +11,148 @@ datasource db {
 }
 
 model User {
-  id                  Int                   @id @default(autoincrement())
-  email               String                @unique
-  name                String?
-  password            String
-  created_at          DateTime              @default(now())
-  updated_at          DateTime
+  id       String @id @default(uuid())
+  email    String @unique
+  name     String
+  password String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  //Rel
   organizationMembers Organization_Member[]
 }
 
 model Testimonial {
   id                String            @id @default(uuid())
   type              TestimonialType
+  status            TestimonialStatus @default(pending)
   title             String
-  content           String
   author            String
   author_photo      String
   author_role       String
+  content           String
   media_url         String
   media_description String
-  status            TestimonialStatus @default(pending)
   rating            Decimal
   slug              String
-  created_at        DateTime          @default(now())
-  updated_at        DateTime
-  published_at      DateTime
-  testimonialTags   Testimonial_Tag[]
-  category_id String
-  category Category @relation(fields: [category_id], references: [id])
-  member_id String
-  member Project_Member @relation(fields: [member_id], references: [id])
-  project_id String
-  project Project @relation(fields:[project_id], references: [id])
 
+  category_id String
+  member_id   String
+  project_id  String
+
+  testimonialTags Testimonial_Tag[]
+
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  published_at DateTime
+
+  //Rel
+  category Category       @relation(fields: [category_id], references: [id])
+  member   Project_Member @relation(fields: [member_id], references: [id])
+  project  Project        @relation(fields: [project_id], references: [id])
 }
 
 model Project {
-  id               String          @id @default(uuid())
-  name             String
-  description      String?
-  api_key          String?
-  organization     Organization    @relation(fields: [organization_id], references: [id])
-  organization_id   String
-  created_at       DateTime        @default(now())
-  projectMembers    Project_Member[] 
-  categories       Category[]
-  testimonials Testimonial[]
-  tags Tag[]
+  id              String  @id @default(uuid())
+  name            String
+  description     String?
+  api_key         String?
+  organization_id String
+
+  projectMembers Project_Member[]
+  categories     Category[]
+  testimonials   Testimonial[]
+  tags           Tag[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  //Rel
+  organization Organization @relation(fields: [organization_id], references: [id])
 }
 
 model Organization {
-  id                  String                @id @default(uuid())
-  name                String
-  description         String?
-  created_at          DateTime              @default(now())
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  user_id     String
+
   projects            Project[]
   organizationMembers Organization_Member[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Organization_Member {
   id              String            @id @default(uuid())
-  user            User              @relation(fields: [user_id], references: [id])
-  user_id          Int
-  organization    Organization      @relation(fields: [organization_id], references: [id])
-  organization_id  String
-  projectMembers  Project_Member[]
+  organization_id String
+  user_id         String
   role            Organization_Role @default(Editor)
+
+  projectMembers Project_Member[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  //Rel
+  user         User         @relation(fields: [user_id], references: [id])
+  organization Organization @relation(fields: [organization_id], references: [id])
 }
 
 model Project_Member {
-  id                     String              @id @default(uuid())
-  organization_member_id  String
-  organization_member    Organization_Member @relation(fields: [organization_member_id], references: [id])
-  project                Project @relation(fields:[project_id], references: [id])
+  id                     String  @id @default(uuid())
+  organization_member_id String
   project_id             String
-  testimonial_id String? 
+  testimonial_id         String?
+
   testimonials Testimonial[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  //Rel
+  organization_member Organization_Member @relation(fields: [organization_member_id], references: [id])
+  project             Project             @relation(fields: [project_id], references: [id])
 }
 
 model Category {
-  id         String   @id @default(uuid())
+  id         String @id @default(uuid())
   name       String
-  created_at DateTime @default(now())
-  updated_at DateTime
-  project    Project  @relation(fields: [project_id], references: [id])
-  project_id  String
+  project_id String
+
   testimonial Testimonial[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  //Rel
+  project Project @relation(fields: [project_id], references: [id])
 }
 
 model Tag {
-  id              String            @id @default(uuid())
-  name            String
-  created_at      DateTime          @default(now())
-  updated_at      DateTime
+  id   String @id @default(uuid())
+  name String
+
   testimonialTags Testimonial_Tag[]
-  projects Project[]
+  projects        Project[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Testimonial_Tag {
-  id             String      @id @default(uuid())
+  id             String @id @default(uuid())
   tag_id         String
-  tag            Tag         @relation(fields: [tag_id], references: [id])
   testimonial_id String
-  testimonial    Testimonial @relation(fields: [testimonial_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  //Rel
+  tag         Tag         @relation(fields: [tag_id], references: [id])
+  testimonial Testimonial @relation(fields: [testimonial_id], references: [id])
 }
 
 enum Organization_Role {
