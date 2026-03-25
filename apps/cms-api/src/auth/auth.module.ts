@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import globalEnv from "@repo/env";
+import { UserRepository } from '@repo/api';
 
 @Module({
     imports: [
@@ -19,6 +20,6 @@ import globalEnv from "@repo/env";
         }),        
     ],
     controllers: [AuthController],
-    providers: [AuthService]
+    providers: [AuthService, UserRepository]
 })
 export class AuthModule {}

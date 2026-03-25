@@ -6,7 +6,6 @@ import globalEnv from '@repo/env';
 import {UserRepository} from "@repo/api"
 import { ValidationPipe } from '@nestjs/common';
 
-import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   console.log('NODE_ENV', globalEnv.NODE_ENV);
