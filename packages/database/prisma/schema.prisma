@@ -132,7 +132,7 @@ model Category {
 
 model Tag {
   id   String @id @default(uuid())
-  name String
+  name String @unique
 
   testimonialTags Testimonial_Tag[]
   projects        Project[]
@@ -142,7 +142,6 @@ model Tag {
 }
 
 model Testimonial_Tag {
-  id             String @id @default(uuid())
   tag_id         String
   testimonial_id String
 
@@ -152,6 +151,7 @@ model Testimonial_Tag {
   //Rel
   tag         Tag         @relation(fields: [tag_id], references: [id])
   testimonial Testimonial @relation(fields: [testimonial_id], references: [id])
+  @@id([tag_id, testimonial_id])
 }
 
 enum Organization_Role {
