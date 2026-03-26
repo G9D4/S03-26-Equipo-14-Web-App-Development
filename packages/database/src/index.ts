@@ -61,3 +61,4 @@ export async function safeDbOperation<T>(
 export * from "@prisma/client";
 export { Prisma, PrismaClient } from "@prisma/client";
 export { Decimal } from "@prisma/client/runtime/library";
+export * from "./types/user.types";

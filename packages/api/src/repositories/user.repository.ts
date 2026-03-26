@@ -3,6 +3,7 @@ import {Organization_Role} from "@workspace/database"
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@workspace/database';
 import { CreateMemberInput, CreateOwnerInput } from './interfaces';
+import {UserWithOrgs} from "@workspace/database"
 
 @Injectable()
 export class UserRepository {
@@ -13,6 +14,21 @@ export class UserRepository {
   }
 
   // update UserRole. update user, tranfer user to other project. example of methods.
+
+  async findByEmail(email: string){
+    return await this.prisma.client.user.findUnique({
+      where: {
+        email
+      },
+      include: {
+        organizationMembers: {
+          include: {
+            organization: true
+          }
+        }
+      }
+    }) as UserWithOrgs
+  }
 
   async createMember(data: CreateMemberInput) {
     return await this.prisma.client.$transaction(async (tx) => {
