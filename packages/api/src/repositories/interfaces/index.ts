@@ -15,3 +15,10 @@ export interface CreateMemberInput {
   projectId: string;
 }
 
+export interface CreateCategoryInput {
+  name: string;
+}
+
+export interface UpdateCategoryInput extends CreateCategoryInput {
+  categoryId: string;
+}
