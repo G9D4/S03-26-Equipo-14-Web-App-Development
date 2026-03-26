@@ -7,6 +7,8 @@ import {
   CreateRegisterMemberDto,
   CreateRegisterOwnerDto,
 } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { JwtPayload } from './types/jwt-payload.type';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +17,7 @@ export class AuthController {
   @Public()
   @Post('login')
   async login(
-    @Body() loginDto: { email: string; password: string },
+    @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const { access_token } = await this.authService.login(loginDto);
@@ -34,7 +36,7 @@ export class AuthController {
   }
 
   @Get('me')
-  async me(@GetUser() user: { userId: string }) {
+  async me(@GetUser() user: JwtPayload) {
     return user;
   }
   @Public()
@@ -49,4 +51,5 @@ export class AuthController {
     //use service registerMember
     return this.authService.registerMember(registerMemberDto);
   }
+
 }

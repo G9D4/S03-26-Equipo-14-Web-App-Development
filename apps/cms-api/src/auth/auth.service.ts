@@ -7,6 +7,8 @@ import {
 } from './dto/register.dto';
 import crypto from 'crypto';
 import { UserRepository } from '@repo/api';
+import { LoginDto } from './dto/login.dto';
+import { JwtPayload } from './types/jwt-payload.type';
 
 @Injectable()
 export class AuthService {
@@ -16,20 +18,23 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
-    // TODO: validate user
-    const user = { email: email, password: pass, _id: '123' };
-
+    
+    const user = await this.apiUser.findByEmail(email);
+    console.log(user)
+    
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const isMatch = pass === user.password;
+    const isMatch = await compare(pass, user.password);
     if (!isMatch) throw new UnauthorizedException('Password not valid');
 
-    return { _id: user._id };
+    const org = user.organizationMembers[0]
+    
+    return { sub: user.id, email: user.email, organizationId: org?.organization_id || null, role: org?.role || null };
   }
 
-  async login(loginDto: { email: string; password: string }) {
-    const user = await this.validateUser(loginDto.email, loginDto.password);
-    const payload = { sub: user._id };
+  async login(loginDto: LoginDto) {
+    const payload: JwtPayload = await this.validateUser(loginDto.email, loginDto.password);
+    
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

@@ -3,6 +3,7 @@ import {ExtractJwt, Strategy} from "passport-jwt"
 import { PassportStrategy } from "@nestjs/passport";
 import type { Request } from "express";
 import env from "@repo/env";
+import { JwtPayload } from "../types/jwt-payload.type";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy){
@@ -18,12 +19,10 @@ export class JwtStrategy extends PassportStrategy(Strategy){
         })
     }
 
-    async validate(payload: {sub: string}): Promise<{userId: string}>{
-        
-        // TODO: validate if user exist
-        return{
-            userId: payload.sub,            
-        }
+    async validate(payload: JwtPayload): Promise<JwtPayload>{
+        if(!payload.sub) throw new UnauthorizedException('Invalid token');        
+
+        return payload
     }
 }
 
