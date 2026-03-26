@@ -7,7 +7,13 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './auth/strategies/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { UserRepository, PrismaModule, PrismaService, } from '@repo/api';
+import {
+  UserRepository,
+  CategoryRepository,
+  PrismaModule,
+  PrismaService,
+} from '@repo/api';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -17,12 +23,14 @@ import { UserRepository, PrismaModule, PrismaService, } from '@repo/api';
       isGlobal: true,
       envFilePath: '../../.env',
     }),
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     JwtStrategy,
     UserRepository,
+    CategoryRepository,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
 })
