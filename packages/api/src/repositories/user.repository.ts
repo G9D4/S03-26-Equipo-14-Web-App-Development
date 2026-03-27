@@ -14,7 +14,7 @@ export class UserRepository {
 
   // update UserRole. update user, tranfer user to other project. example of methods.
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string) {    
     return await this.prisma.client.user.findUnique({
       where: {
         email,

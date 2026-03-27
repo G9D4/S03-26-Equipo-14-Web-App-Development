@@ -9,6 +9,8 @@ import crypto from 'crypto';
 import { UserRepository } from '@repo/api';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './types/jwt-payload.type';
+import sgMail from '@sendgrid/mail';
+import globalEnv from '@repo/env';
 
 @Injectable()
 export class AuthService {
@@ -66,7 +68,32 @@ export class AuthService {
     await this.apiUser.createMember(synthUser);
   }
 
+  async forgotPassword (user : JwtPayload) {
+    const rawToken = crypto.randomInt(100000, 1000000).toString();
+    const hashedToken = await hash(rawToken, 10);
+    const resetExpiration = new Date(Date.now() + 3600000);
+    sgMail.setApiKey(globalEnv.SGMAIL_TOKEN)
+
+    const msg = {
+      to: "francocasafus55@gmail.com",
+      from: "francocasafus55@gmail.com",
+      subject: "Sending with SendGrid is Fun",
+      html: `<h2>Tu código</h2>
+            <h1 style="letter-spacing: 5px;">${rawToken}</h1>`,
+    };
+    
+    await sgMail.send(msg);
+
+    //TODO: save the reserToken in db
+
+    return {
+      message: "Email sent",      
+    }
+  }
+
   private async generateRandomPassword() {
     return crypto.randomBytes(4).toString('base64').slice(0, 6);
   }
+
+  
 }
