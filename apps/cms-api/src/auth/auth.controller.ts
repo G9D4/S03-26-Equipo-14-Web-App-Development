@@ -9,6 +9,7 @@ import {
 } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './types/jwt-payload.type';
+import { ResetPasswordDto } from 'src/category/dto/reset-password.dto';
 
 
 @Controller('auth')
@@ -38,9 +39,9 @@ export class AuthController {
 
   @Public()
   @Post('forgot-password')
-  async forgotPassword(@GetUser() user: JwtPayload) {
+  async forgotPassword(@Body() resetPasswordDto: ResetPasswordDto) {
 
-    return this.authService.forgotPassword(user);
+    return this.authService.forgotPassword(resetPasswordDto);
   }
 
   @Get('me')

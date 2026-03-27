@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
 import {
@@ -11,11 +11,15 @@ import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './types/jwt-payload.type';
 import sgMail from '@sendgrid/mail';
 import globalEnv from '@repo/env';
+import { ResetPasswordDto } from 'src/category/dto/reset-password.dto';
+import { resetPasswordTemplate } from 'src/mail/templates/reset-password.template';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
+    private mailService: MailService,
     private readonly apiUser: UserRepository,
   ) {}
 
@@ -68,23 +72,18 @@ export class AuthService {
     await this.apiUser.createMember(synthUser);
   }
 
-  async forgotPassword (user : JwtPayload) {
+  async forgotPassword (resetPasswordDto: ResetPasswordDto) {
+
+    const userExist = await this.apiUser.findByEmail(resetPasswordDto.email);
+    if (!userExist) throw new NotFoundException("User not found");
+
     const rawToken = crypto.randomInt(100000, 1000000).toString();
     const hashedToken = await hash(rawToken, 10);
-    const resetExpiration = new Date(Date.now() + 3600000);
-    sgMail.setApiKey(globalEnv.SGMAIL_TOKEN)
+    const resetExpiration = new Date(Date.now() + 3600000); // 1hs    
 
-    const msg = {
-      to: "francocasafus55@gmail.com",
-      from: "francocasafus55@gmail.com",
-      subject: "Sending with SendGrid is Fun",
-      html: `<h2>Tu código</h2>
-            <h1 style="letter-spacing: 5px;">${rawToken}</h1>`,
-    };
+    await this.mailService.sendResetPassword(userExist.email, userExist.name, rawToken);    
     
-    await sgMail.send(msg);
-
-    //TODO: save the reserToken in db
+    await this.apiUser.setResetToken({userId: userExist.id, resetToken: hashedToken, resetTokenExpires: resetExpiration});
 
     return {
       message: "Email sent",      

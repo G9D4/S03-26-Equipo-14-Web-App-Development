@@ -14,6 +14,7 @@ import {
   PrismaService,
 } from '@repo/api';
 import { CategoryModule } from './category/category.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CategoryModule } from './category/category.module';
       envFilePath: '../../.env',
     }),
     CategoryModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
