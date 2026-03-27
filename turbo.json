@@ -4,6 +4,7 @@
   "globalEnv": [
     "NODE_ENV",
     "JWT_SECRET",
+    "NEXTAUTH_SECRET",
     "PORT",
     "NEXT_PUBLIC_API_URL",
     "PRISMA_LOGS",
@@ -17,6 +18,7 @@
       "env": [
         "NODE_ENV",
         "JWT_SECRET",
+        "NEXTAUTH_SECRET",
         "PORT",
         "NEXT_PUBLIC_API_URL",
         "PRISMA_LOGS",

@@ -9,6 +9,7 @@ export function RegisterForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,17 +27,36 @@ export function RegisterForm() {
     }
 
     try {
-      // TODO: conectar con endpoint de registro
-      console.log({
-        orgName: formData.get('orgName'),
-        projectName: formData.get('projectName'),
-        ownerName: formData.get('ownerName'),
-        email: formData.get('email'),
-        password,
+      if (!apiUrl) {
+        throw new Error('NEXT_PUBLIC_API_URL no está configurada');
+      }
+
+      const response = await fetch(`${apiUrl}/auth/owner`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.get('email'),
+          password,
+          name: formData.get('ownerName'),
+          organizationName: formData.get('orgName'),
+          organizationDescription: formData.get('projectName'),
+        }),
       });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        const message =
+          body && typeof body.message === 'string'
+            ? body.message
+            : 'No se pudo registrar la cuenta';
+        throw new Error(message);
+      }
+
       router.push('/auth/login');
     } catch (err) {
-      setError('Ocurrió un error inesperado');
+      setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado');
       console.error(err);
     } finally {
       setIsLoading(false);
