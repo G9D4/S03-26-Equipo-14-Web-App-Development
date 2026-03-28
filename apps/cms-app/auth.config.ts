@@ -2,6 +2,21 @@ import Credentials from 'next-auth/providers/credentials';
 import type { NextAuthOptions } from 'next-auth';
 import globalEnv from '@repo/env';
 
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string;
+      email?: string | null;
+      name?: string | null;
+      image?: string | null;
+      role?: string | null;
+      organizationId: string | null;
+      accessToken: string;
+    } | null;
+  }
+}
+const authSecret = globalEnv.JWT_SECRET;
+
 type MeResponse = {
   sub: string;
   email: string;
@@ -72,6 +87,8 @@ export const authConfig: NextAuthOptions = {
           }
 
           const me = (await meResponse.json()) as MeResponse;
+          console.log('User info from /auth/me:', me);
+          console.log('authToken', authToken);
 
           return {
             id: me.sub,
@@ -91,7 +108,9 @@ export const authConfig: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.sub = user.id;
+        console.log('user jwt  login', user);
+
+        token.id = user.id;
         token.email = user.email;
         token.organizationId = (
           user as { organizationId?: string | null }
@@ -104,45 +123,19 @@ export const authConfig: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.email = token.email ?? session.user.email;
+        session.user.id = token.id as string;
+        session.user.organizationId = token.organizationId as string | null;
+        session.user.role = token.role as string | null;
+        session.user.accessToken = token.accessToken as string;
+        session.user.name = token.email;
+        session.user.email = token.email;
       }
-
-      (session as { accessToken?: string }).accessToken = token.accessToken as
-        | string
-        | undefined;
-      (
-        session as {
-          user: {
-            id?: string;
-            organizationId?: string | null;
-            role?: string | null;
-          };
-        }
-      ).user.id = token.sub;
-      (
-        session as {
-          user: {
-            id?: string;
-            organizationId?: string | null;
-            role?: string | null;
-          };
-        }
-      ).user.organizationId =
-        (token.organizationId as string | null | undefined) ?? null;
-      (
-        session as {
-          user: {
-            id?: string;
-            organizationId?: string | null;
-            role?: string | null;
-          };
-        }
-      ).user.role = (token.role as string | null | undefined) ?? null;
+      console.log('session user', session);
 
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: authSecret,
   session: {
     strategy: 'jwt',
     maxAge: 60 * 60 * 24, // 1 día

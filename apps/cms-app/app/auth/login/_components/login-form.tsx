@@ -1,43 +1,58 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, BarChart2 } from 'lucide-react';
+import { Mail, Lock, BookOpen } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+
+type LoginFormValues = {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+};
 
 export function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+    mode: 'onTouched',
+  });
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setIsLoading(true);
+  async function onSubmit(data: LoginFormValues) {
     setError(null);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
 
     try {
       const result = await signIn('credentials', {
-        email,
-        password,
+        email: data.email,
+        password: data.password,
+        rememberMe: data.rememberMe,
         redirect: false,
       });
 
       if (result?.error) {
-        setError(result.error || 'Error al iniciar sesión');
+        const authError =
+          result.error === 'CredentialsSignin'
+            ? 'Credenciales inválidas. Verifica tu correo y contraseña.'
+            : result.error || 'Error al iniciar sesión';
+        setError(authError);
       } else if (result?.ok) {
         router.push('/dashboard');
       }
     } catch (err) {
-      setError('Ocurrió un error inesperado');
+      const message = 'Ocurrió un error inesperado';
+      setError(message);
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -48,7 +63,7 @@ export function LoginForm() {
         {/* Logo + Brand */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center mb-4 shadow-lg">
-            <BarChart2 className="w-7 h-7 text-white" />
+            <BookOpen className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Geist EdTech</h1>
           <p className="text-sm text-gray-500 mt-1">Accede al Portal de Testimonios</p>
@@ -56,7 +71,7 @@ export function LoginForm() {
 
         {/* Card */}
         <div className="w-full max-w-sm bg-white rounded-2xl shadow-md p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-[10px] font-semibold uppercase tracking-widest text-gray-500 mb-1.5">
@@ -67,12 +82,21 @@ export function LoginForm() {
                 <input
                   type="email"
                   id="email"
-                  name="email"
-                  required
+                  aria-invalid={Boolean(errors.email)}
+                  {...register('email', {
+                    required: 'El correo es obligatorio',
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: 'Ingresa un correo válido',
+                    },
+                  })}
                   className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border-0 rounded-lg text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="name@institution.edu"
                 />
               </div>
+              {errors.email && (
+                <p className="mt-1.5 text-xs text-red-600">{errors.email.message}</p>
+              )}
             </div>
 
             {/* Password */}
@@ -90,12 +114,21 @@ export function LoginForm() {
                 <input
                   type="password"
                   id="password"
-                  name="password"
-                  required
+                  aria-invalid={Boolean(errors.password)}
+                  {...register('password', {
+                    required: 'La contraseña es obligatoria',
+                    minLength: {
+                      value: 6,
+                      message: 'Debe tener al menos 6 caracteres',
+                    },
+                  })}
                   className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border-0 rounded-lg text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="••••••••"
                 />
               </div>
+              {errors.password && (
+                <p className="mt-1.5 text-xs text-red-600">{errors.password.message}</p>
+              )}
             </div>
 
             {/* Remember me */}
@@ -103,8 +136,7 @@ export function LoginForm() {
               <input
                 type="checkbox"
                 id="remember"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+                {...register('rememberMe')}
                 className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
               <label htmlFor="remember" className="text-sm text-gray-600 select-none">
@@ -121,10 +153,10 @@ export function LoginForm() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
             >
-              {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión en el Dashboard →'}
+              {isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión en el Dashboard →'}
             </button>
           </form>
 

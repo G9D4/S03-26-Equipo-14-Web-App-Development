@@ -2,5 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm build"
+  "buildCommand": "pnpm build",
+  "jobs": [
+    {
+      "name": "keep-backend-alive",
+      "schedule": "*/5 * * * *",
+      "url": "https://s03-26-equipo-14-web-app-development.onrender.com/",
+      "method": "GET"
+    }
+  ]
 }
