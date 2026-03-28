@@ -10,11 +10,12 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import {
   UserRepository,
   CategoryRepository,
+  TestimonialRepository,
   PrismaModule,
-  PrismaService,
 } from '@repo/api';
 import { CategoryModule } from './category/category.module';
 import { MailModule } from './mail/mail.module';
+import { TestimonialsModule } from './testimonials/testimonials.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MailModule } from './mail/mail.module';
     }),
     CategoryModule,
     MailModule,
+    TestimonialsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -33,6 +35,7 @@ import { MailModule } from './mail/mail.module';
     JwtStrategy,
     UserRepository,
     CategoryRepository,
+    TestimonialRepository,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
 })
