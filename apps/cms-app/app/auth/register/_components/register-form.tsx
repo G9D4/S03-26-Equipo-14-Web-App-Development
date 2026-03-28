@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BadgeCheck, BarChart2, CheckCircle2, Sparkles } from '@repo/ui/lib';
+import { BadgeCheck, BarChart2, BookOpen, CheckCircle2, Sparkles } from '@repo/ui/lib';
 import { useForm } from 'react-hook-form';
 import {
   Badge,
@@ -99,7 +99,7 @@ export function RegisterForm() {
         {/* Navbar */}
         <div className="flex items-center gap-2 mb-auto">
           <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow">
-            <BarChart2 className="w-5 h-5 text-white" />
+            <BookOpen className="w-5 h-5 text-white" />
           </div>
           <span className="font-bold text-gray-900 text-base">Geist EdTech</span>
         </div>
