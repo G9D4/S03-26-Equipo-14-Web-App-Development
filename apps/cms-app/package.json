@@ -14,7 +14,6 @@
     "@repo/env": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.95.2",
-    "lucide-react": "^0.475.0",
     "next": "16.2.0",
     "next-auth": "^4.24.13",
     "react": "^19.1.0",
