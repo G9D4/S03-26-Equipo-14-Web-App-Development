@@ -1,9 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
 import {
@@ -16,9 +11,12 @@ import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './types/jwt-payload.type';
 import sgMail from '@sendgrid/mail';
 import globalEnv from '@repo/env';
-import { ResetPasswordDto } from 'src/category/dto/reset-password.dto';
+import { ResetPasswordDto } from 'src/auth/dto/reset-password.dto';
 import { resetPasswordTemplate } from 'src/mail/templates/reset-password.template';
 import { MailService } from 'src/mail/mail.service';
+import {ValidateTokenDto } from './dto/validate-token.dto';
+import { ValidateTokenQueryDto } from './dto/validate-token-query.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -102,32 +100,65 @@ export class AuthService {
     }
   }
 
-  async forgotPassword(resetPasswordDto: ResetPasswordDto) {
-    const userExist = await this.apiUser.findByEmail(resetPasswordDto.email);
-    if (!userExist) throw new NotFoundException('User not found');
+  async forgotPassword (forgotPasswordDto: ForgotPasswordDto) {
+
+    const userExist = await this.apiUser.findByEmail(forgotPasswordDto.email);
+    if (!userExist) throw new NotFoundException("User not found");
 
     const rawToken = crypto.randomInt(100000, 1000000).toString();
     const hashedToken = await hash(rawToken, 10);
     const resetExpiration = new Date(Date.now() + 3600000); // 1hs
 
-    await this.mailService.sendResetPassword(
-      userExist.email,
-      userExist.name,
-      rawToken,
-    );
-
-    await this.apiUser.setResetToken({
-      userId: userExist.id,
-      resetToken: hashedToken,
-      resetTokenExpires: resetExpiration,
-    });
+    console.log(rawToken)
+    await this.mailService.sendResetPassword(userExist.email, userExist.name, rawToken);    
+    
+    await this.apiUser.setResetToken({userId: userExist.id, resetToken: hashedToken, resetTokenExpires: resetExpiration});
 
     return {
       message: 'Email sent',
     };
   }
 
+  async validateToken({token, email} : {token: string, email: string}) {
+    
+    const userExist = await this.apiUser.findByEmail(email);
+    if (!userExist) throw new NotFoundException("User not found");
+
+    if (!userExist.resetTokenExpires || userExist.resetTokenExpires < new Date()) {
+      throw new BadRequestException("Token expired");
+    }
+
+    const isMatch = await compare(token, userExist.resetToken!);
+    if (!isMatch) throw new NotFoundException("Token not valid");
+
+    const resetToken = this.jwtService.sign({
+      userId: userExist.id
+    },{
+      secret: globalEnv.JWT_RESET_TOKEN_SECRET,
+      expiresIn: '1h'
+    })
+
+    await this.apiUser.deleteResetToken({userId: userExist.id});
+
+    return resetToken
+  }
+
+  async resetPassword({userId, newPassword} : {userId: string, newPassword: string}) {
+    
+    const userExist = await this.apiUser.findById(userId);
+    if (!userExist) throw new NotFoundException("User not found");
+
+    const hashPassword = await hash(newPassword, 10);
+
+    await this.apiUser.changePassword(hashPassword, userId);
+
+    return {
+      message: "Password changed"
+    }
+  }
+
   private async generateRandomPassword() {
     return crypto.randomBytes(4).toString('base64').slice(0, 6);
   }
+
 }

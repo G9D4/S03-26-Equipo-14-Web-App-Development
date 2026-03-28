@@ -39,6 +39,33 @@ export class UserRepository {
     });
   }
 
+  async changePassword(newPassword: string, userId: string){
+    return await this.prisma.client.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        password: newPassword
+      }
+    })
+  }
+
+  async findById(userId: string, includeOrganzatonMembers?: boolean) {
+    const include = includeOrganzatonMembers ? {
+      organizationMembers: {
+        include: {
+          organization: true,
+        },
+      },
+    } : {}
+
+    return await this.prisma.client.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include,
+    });
+  }    
   async createMember(data: CreateMemberInput) {
     return await this.prisma.client.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -128,5 +155,17 @@ export class UserRepository {
         resetTokenExpires,
       },
     });
+  }
+
+  async deleteResetToken({userId} : { userId: string}) : Promise<void>{
+    await this.prisma.client.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        resetToken: null,
+        resetTokenExpires: null
+      }
+    })
   }
 }
