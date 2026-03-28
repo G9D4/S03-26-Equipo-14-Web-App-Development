@@ -85,9 +85,9 @@ export const authConfig: NextAuthOptions = {
             return null;
           }
 
-          const me = (await meResponse.json()) as MeResponse;
-          console.log('User info from /auth/me:', me);
-          console.log('authToken', authToken);
+          const { data: me } = (await meResponse.json()) as {
+            data: MeResponse;
+          };
 
           return {
             id: me.sub,
