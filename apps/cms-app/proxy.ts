@@ -1,9 +1,8 @@
-import globalEnv from '@repo/env';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 export default async function proxy(request: NextRequest) {
-  const isProd = globalEnv.NODE_ENV === 'production' ? true : false;
+  const isProd = process.env.NODE_ENV === 'production' ? true : false;
   const isAuthenticated = request.cookies.get(
     isProd ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
   )?.value;

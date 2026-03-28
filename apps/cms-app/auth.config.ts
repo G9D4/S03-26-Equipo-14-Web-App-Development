@@ -1,6 +1,5 @@
 import Credentials from 'next-auth/providers/credentials';
 import type { NextAuthOptions } from 'next-auth';
-import globalEnv from '@repo/env';
 
 declare module 'next-auth' {
   interface Session {
@@ -15,7 +14,7 @@ declare module 'next-auth' {
     } | null;
   }
 }
-const authSecret = globalEnv.JWT_SECRET;
+const authSecret = process.env.JWT_SECRET;
 
 type MeResponse = {
   sub: string;
@@ -42,7 +41,7 @@ export const authConfig: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Email and password are required');
         }
-        const apiUrl = globalEnv.NEXT_PUBLIC_API_URL;
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
         if (!apiUrl) {
           throw new Error('NEXT_PUBLIC_API_URL is not configured');
