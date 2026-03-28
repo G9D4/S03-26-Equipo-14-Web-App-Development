@@ -27,29 +27,39 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
-    
     const user = await this.apiUser.findByEmail(email);
-    console.log(user)
-    
+    console.log(user);
+
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const isMatch = await compare(pass, user.password);
     if (!isMatch) throw new UnauthorizedException('Password not valid');
 
-    const org = user.organizationMembers[0]
-    
-    return { sub: user.id, email: user.email, organizationId: org?.organization_id || null, role: org?.role || null };
+    const org = user.organizationMembers[0];
+
+    return {
+      sub: user.id,
+      email: user.email,
+      organizationId: org?.organization_id || null,
+      role: org?.role || null,
+    };
   }
 
   async login(loginDto: LoginDto) {
-    const payload: JwtPayload = await this.validateUser(loginDto.email, loginDto.password);
-    
+    const payload: JwtPayload = await this.validateUser(
+      loginDto.email,
+      loginDto.password,
+    );
+
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
   }
 
   async registerOwner(registerOwnerDto: CreateRegisterOwnerInput) {
+    const user = await this.apiUser.findByEmail(registerOwnerDto.email);
+    if (user) throw new ConflictException('Email already exists registered');
+
     const { password, ...newOwner } = registerOwnerDto;
 
     const hashPassword = await hash(password, 10);
@@ -58,12 +68,21 @@ export class AuthService {
       ...newOwner,
       hashPassword: hashPassword,
     };
-
-    await this.apiUser.createOwner(synthUser);
+    try {
+      await this.apiUser.createOwner(synthUser);
+      return { message: 'Owner Created Successfully' };
+    } catch (error) {
+      throw new ConflictException('Error in Owner Creation');
+    }
   }
 
   async registerMember(registerMemberDto: CreateRegisterMemberInput) {
     const randomPass = await this.generateRandomPassword();
+
+    const member = await this.apiUser.findByEmail(registerMemberDto.email);
+    const orgId = member?.organizationMembers[0]?.id;
+    if (orgId === registerMemberDto.organizationId)
+      throw new ConflictException('Member arleady exists in organization');
 
     const hashPassword = await hash(randomPass, 10);
 
@@ -72,7 +91,13 @@ export class AuthService {
       generatePassword: hashPassword,
     };
 
-    await this.apiUser.createMember(synthUser);
+    try {
+      await this.apiUser.createMember(synthUser);
+      await this.mailService.sendNewPassword(synthUser.email, randomPass);
+      return { message: 'Member Created successfully' };
+    } catch (error) {
+      throw new ConflictException('Error in Member Creation');
+    }
   }
 
   async forgotPassword (forgotPasswordDto: ForgotPasswordDto) {
@@ -82,7 +107,7 @@ export class AuthService {
 
     const rawToken = crypto.randomInt(100000, 1000000).toString();
     const hashedToken = await hash(rawToken, 10);
-    const resetExpiration = new Date(Date.now() + 3600000); // 1hs    
+    const resetExpiration = new Date(Date.now() + 3600000); // 1hs
 
     console.log(rawToken)
     await this.mailService.sendResetPassword(userExist.email, userExist.name, rawToken);    
@@ -90,8 +115,8 @@ export class AuthService {
     await this.apiUser.setResetToken({userId: userExist.id, resetToken: hashedToken, resetTokenExpires: resetExpiration});
 
     return {
-      message: "Email sent",      
-    }
+      message: 'Email sent',
+    };
   }
 
   async validateToken({token, email} : {token: string, email: string}) {
