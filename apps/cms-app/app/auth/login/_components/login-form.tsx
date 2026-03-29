@@ -166,7 +166,7 @@ export function LoginForm() {
                       <FormControl>
                         <Checkbox
                           checked={field.value}
-                          onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+                          onCheckedChange={(checked: boolean | 'indeterminate') => field.onChange(Boolean(checked))}
                           className="w-4 h-4 rounded border-gray-300 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
                         />
                       </FormControl>
